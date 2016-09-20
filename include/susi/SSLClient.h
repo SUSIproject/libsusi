@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, webvariants GmbH, http://www.webvariants.de
+ * Copyright (c) 2016, Tino Rusch
  *
  * This file is released under the terms of the MIT license. You can find the
  * complete text in the attached LICENSE file or online at:
@@ -25,43 +25,42 @@ using boost::asio::ip::tcp;
 
 namespace Susi {
 class SSLClient {
-  public:
-    SSLClient(std::string host, short port);
+public:
+  SSLClient(std::string host, short port);
 
-    SSLClient(std::string host, short port, std::string keyfile, std::string certfile);
+  SSLClient(std::string host, short port, std::string keyfile,
+            std::string certfile);
 
-    void join();
+  void join();
 
-    virtual ~SSLClient();
+  virtual ~SSLClient();
 
-    virtual void onConnect() = 0;
-    virtual void onData(char *data, size_t len) = 0;
-    virtual void onClose() = 0;
+  virtual void onConnect() = 0;
+  virtual void onData(char *data, size_t len) = 0;
+  virtual void onClose() = 0;
 
-    void send(std::string msg);
+  void send(std::string msg);
 
-    std::string getCertificateHash();
-    std::string getCertificate();
+  std::string getCertificateHash();
+  std::string getCertificate();
 
+protected:
+  void do_resolve(std::string host, std::string port);
+  void do_connect();
+  void do_read();
+  void do_write();
 
-  protected:
-
-    void do_resolve(std::string host, std::string port);
-    void do_connect();
-    void do_read();
-    void do_write();
-
-    boost::asio::io_service io_service_;
-    tcp::resolver::iterator endpoint_iterator_;
-    tcp::resolver resolver_{io_service_};
-    boost::asio::ssl::context context_{boost::asio::ssl::context::tlsv12};
-    std::shared_ptr<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>> socket_;
-    enum {BUFFSIZE = 1024};
-    char buff[BUFFSIZE];
-    std::deque<std::string> write_msgs_;
-    std::thread runloop_;
+  boost::asio::io_service io_service_;
+  tcp::resolver::iterator endpoint_iterator_;
+  tcp::resolver resolver_{io_service_};
+  boost::asio::ssl::context context_{boost::asio::ssl::context::tlsv12};
+  std::shared_ptr<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>
+      socket_;
+  enum { BUFFSIZE = 1024 };
+  char buff[BUFFSIZE];
+  std::deque<std::string> write_msgs_;
+  std::thread runloop_;
 };
-
 }
 
 #endif // __SSLCLIENT__

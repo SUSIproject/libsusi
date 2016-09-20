@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, webvariants GmbH, http://www.webvariants.de
+ * Copyright (c) 2016, Tino Rusch
  *
  * This file is released under the terms of the MIT license. You can find the
  * complete text in the attached LICENSE file or online at:
@@ -18,25 +18,25 @@
 #include <iostream>
 
 namespace Susi {
-template <class Framer, class Client>
-class FramingClient : public Client {
-  protected:
-    std::shared_ptr<Framer> framer;
-  public:
-    FramingClient(std::string host, short port, std::string keyFile, std::string certificateFile) :
-        Client{host, port, keyFile, certificateFile} {
-        framer = std::make_shared<Framer>([this](std::string & frame) {onFrame(frame);});
-    }
-    virtual ~FramingClient() {}
+template <class Framer, class Client> class FramingClient : public Client {
+protected:
+  std::shared_ptr<Framer> framer;
 
-    virtual void onData(char *data, size_t len) override {
-        framer->collect(data, len);
-    }
+public:
+  FramingClient(std::string host, short port, std::string keyFile,
+                std::string certificateFile)
+      : Client{host, port, keyFile, certificateFile} {
+    framer = std::make_shared<Framer>(
+        [this](std::string &frame) { onFrame(frame); });
+  }
+  virtual ~FramingClient() {}
 
-    virtual void onFrame(std::string & msg) = 0;
+  virtual void onData(char *data, size_t len) override {
+    framer->collect(data, len);
+  }
 
+  virtual void onFrame(std::string &msg) = 0;
 };
-
 }
 
 #endif // __FRAMINGCLIENT__

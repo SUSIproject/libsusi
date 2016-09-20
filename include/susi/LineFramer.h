@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, webvariants GmbH, http://www.webvariants.de
+ * Copyright (c) 2016, Tino Rusch
  *
  * This file is released under the terms of the MIT license. You can find the
  * complete text in the attached LICENSE file or online at:
@@ -20,19 +20,20 @@
 #include <iostream>
 
 namespace Susi {
-    class LineFramer {
-    protected:
-        std::string message = "";
-        size_t opening = 0;
-        size_t closing = 0;
-        bool inQuotes = false;
-        std::function<void( std::string& )> _onMessage;
-    public:
-        LineFramer( std::function<void( std::string& )> onMessage );
-        LineFramer();
-        void operator=( const LineFramer & other );
-        void collect( char * data, size_t len );
-    };
+class LineFramer {
+protected:
+  std::string message = "";
+  size_t opening = 0;
+  size_t closing = 0;
+  bool inQuotes = false;
+  std::function<void(std::string &)> _onMessage;
+
+public:
+  LineFramer(std::function<void(std::string &)> onMessage);
+  LineFramer();
+  void operator=(const LineFramer &other);
+  void collect(char *data, size_t len);
+};
 }
 
 #endif // __JSONFRAMER__
