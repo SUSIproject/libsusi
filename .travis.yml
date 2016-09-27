@@ -8,3 +8,13 @@ before_install:
 
 script:
   - docker run -v $(pwd):/src trusch/susi-builder:stable
+  - cp build/*.deb ./libsusi-${TRAVIS_BRANCH}-linux-amd64.deb
+
+deploy:
+  provider: releases
+  file: "libsusi-${TRAVIS_BRANCH}-linux-amd64.deb"
+  skip_cleanup: true
+  on:
+    tags: true
+  api_key:
+    secure: CSM6VMrCZLS2fjVVN8tI934hdJWjMzPyrNjofJViBeJDY1jqWcO4CfsO0thjEED5p2kCgBzuLj8Fa5JfemnB7rarjle7czvEz7t2RyZHyIfyVWfUC9rpIJgd7sM+EyoEtW/PWIOYFykQ0M4IH8q3gljwwCdqlDFhEs12RdAJDST3C3uP6W3Ll+F69bRi/3iv3xS9AuQRy6LG2dWrnq4fEEz14kJI8savxXiUCuLBqfFShbamKRvYK5B3f+OcuYp2dXOcb62p8Xx68yWqin5I2OX5mZnUnPOROqBjULlJGSgpgSvp1iS5SvGMBX+xgJAnfeQoq8Io3Zq733DArBYfIt3G+iMeP3GGIh1FY3G/9a9Zt4JGOv3KpI3MXKIngAdAtXuhkuZhrdu8dsebwWS4gtWKJ68CA9EcgbPkgcEPNwYb9njPKMyN75rYcdy82jond3GgaUx0nxEKubrtgNyZaNEgA5AQgY3vQyM35K631fbccLFZJFnSaW0DJsZ8e35p7Rr3IWIuiJQwZE34SE3mC+7ts2+wC4qpOaBe6KZzU5qwj7GHckhlimbciAmTUsYzAL+LqbGyW7FAoCe83WPFPXI6BhsKj7Ej4gSg9FC+VQmKGlkro+DTBOmHz8uD6i52f8WPRp1ymFgt2C9xI/OepKYqWjrkfSYutHnBWO5bO38=
