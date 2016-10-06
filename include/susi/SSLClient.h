@@ -45,11 +45,13 @@ public:
   std::string getCertificate();
 
 protected:
-  void do_resolve(std::string host, std::string port);
+  void do_resolve();
   void do_connect();
   void do_read();
   void do_write();
 
+  std::string host;
+  std::string port;
   boost::asio::io_service io_service_;
   tcp::resolver::iterator endpoint_iterator_;
   tcp::resolver resolver_{io_service_};

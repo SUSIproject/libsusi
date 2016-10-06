@@ -12,18 +12,19 @@
 #include "susi/SSLClient.h"
 
 Susi::SSLClient::SSLClient(std::string host, short port, std::string keyfile,
-                           std::string certfile) {
+                           std::string certfile)
+    : host{host}, port{std::to_string(port)} {
   context_.use_private_key_file(keyfile, boost::asio::ssl::context::pem);
   context_.use_certificate_file(certfile, boost::asio::ssl::context::pem);
   socket_ =
       std::make_shared<boost::asio::ssl::stream<boost::asio::ip::tcp::socket>>(
           io_service_, context_);
-  do_resolve(host, std::to_string(port));
+  do_resolve();
   runloop_ = std::move(std::thread{[this]() { io_service_.run(); }});
 }
 
 Susi::SSLClient::SSLClient(std::string host, short port) {
-  do_resolve(host, std::to_string(port));
+  do_resolve();
   runloop_ = std::move(std::thread{[this]() {
     io_service_.run();
     std::cout << "io_service returned..." << std::endl;
@@ -50,11 +51,10 @@ void Susi::SSLClient::send(std::string msg) {
   });
 }
 
-void Susi::SSLClient::do_resolve(std::string host, std::string port) {
+void Susi::SSLClient::do_resolve() {
   resolver_.async_resolve(
-      {host, port},
-      [this, host, port](boost::system::error_code ec,
-                         boost::asio::ip::tcp::resolver::iterator iterator) {
+      {host, port}, [this](boost::system::error_code ec,
+                           boost::asio::ip::tcp::resolver::iterator iterator) {
         if (!ec) {
           endpoint_iterator_ = iterator;
           do_connect();
@@ -62,7 +62,7 @@ void Susi::SSLClient::do_resolve(std::string host, std::string port) {
           std::this_thread::sleep_for(std::chrono::seconds{1});
           std::cout << "try reconnecting because of " << ec.message()
                     << std::endl;
-          do_resolve(host, port);
+          do_resolve();
         }
       });
 }
@@ -82,14 +82,14 @@ void Susi::SSLClient::do_connect() {
                   std::this_thread::sleep_for(std::chrono::seconds{1});
                   std::cout << "try reconnecting because of " << ec.message()
                             << std::endl;
-                  do_connect();
+                  do_resolve();
                 }
               });
         } else {
           std::this_thread::sleep_for(std::chrono::seconds{1});
           std::cout << "try reconnecting because of " << ec.message()
                     << std::endl;
-          do_connect();
+          do_resolve();
         }
       });
 }
@@ -105,7 +105,7 @@ void Susi::SSLClient::do_read() {
           socket_->lowest_layer().close();
           std::this_thread::sleep_for(std::chrono::seconds{1});
           std::cout << "try reconnecting" << std::endl;
-          do_connect();
+          do_resolve();
         }
       });
 }
@@ -124,7 +124,7 @@ void Susi::SSLClient::do_write() {
           socket_->lowest_layer().close();
           std::this_thread::sleep_for(std::chrono::seconds{1});
           std::cout << "try reconnecting" << std::endl;
-          do_connect();
+          do_resolve();
         }
       });
 }
