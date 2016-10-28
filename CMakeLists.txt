@@ -20,7 +20,7 @@ find_package(OpenSSL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system program_options)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/submodules/libbson)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/submodules/libbson/src/headers)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/submodules/libbson/include)
 
 include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
